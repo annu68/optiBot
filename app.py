@@ -3,7 +3,6 @@ from flask import Flask, request
 import requests
 from dotenv import load_dotenv
 
-# Load .env variables
 load_dotenv()
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -20,7 +19,6 @@ def telegram_webhook():
         user_msg = data["message"]["text"]
 
         try:
-            # Claude via OpenRouter API
             headers = {
                 "Authorization": f"Bearer {OPENROUTER_API_KEY}",
                 "Content-Type": "application/json"
@@ -28,11 +26,14 @@ def telegram_webhook():
             payload = {
                 "model": "anthropic/claude-3-sonnet",
                 "messages": [
-                    {"role": "system", "content": "You are a helpful optical networking assistant."},
                     {"role": "user", "content": user_msg}
                 ]
             }
-            response = requests.post("https://openrouter.ai/api/v1/chat/completions", json=payload, headers=headers)
+            response = requests.post(
+                "https://openrouter.ai/api/v1/chat/completions",
+                json=payload,
+                headers=headers
+            )
             reply = response.json()["choices"][0]["message"]["content"]
 
         except Exception as e:
